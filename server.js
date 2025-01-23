@@ -27,6 +27,7 @@ app.post(
       if (!message) {
         return res.status(400).json({ error: "Text is required" });
       }
+      res.json(message);
     }
     catch (error) {
       console.log(error.message)
