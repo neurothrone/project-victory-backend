@@ -6,15 +6,27 @@ const https = require("https");
 const { Server } = require("socket.io");
 const app = express();
 const server = https.createServer(app);
-const io = new Server(server);
-
-
 const PORT = process.env.PORT || 3000;
 const cors = require("cors");
+
+const io = new Server(server, {
+  cors: {
+      origin: "https://witty-tree-0301e6603.4.azurestaticapps.net", // Frontend URL
+      methods: ["GET", "POST"],
+  },
+});
 
 app.use(express.static("public"));
 app.use(express.json());
 app.use(cors());
+
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
+
+  socket.on("disconnect", () => {
+      console.log("A user disconnected:", socket.id);
+  });
+});
 
 app.get(
   "/api/messages",
@@ -54,7 +66,7 @@ mongoose.
 connect(process.env.MONGO_URI)
 .then(() => {
   console.log("connected to mongodb");
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`)
   })
   
