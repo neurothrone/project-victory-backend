@@ -8,5 +8,6 @@
 # Mac system files
 .DS_Store
 
+node_modules
 # Node modules
 backend/node_modules
