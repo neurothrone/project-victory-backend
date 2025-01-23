@@ -9,7 +9,7 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 const cors = require("cors");
 
-const CLIENT_URL = "https://nice-grass-0741fb703.4.azurestaticapps.net/";
+const CLIENT_URL = "https://nice-grass-0741fb703.4.azurestaticapps.net";
 
 app.use(express.static("public"));
 app.use(express.json());
