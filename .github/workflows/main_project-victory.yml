@@ -6,7 +6,7 @@ name: Build and deploy Node.js app to Azure Web App - project-victory
 on:
   push:
     branches:
-      - main
+      - develop-stage
   workflow_dispatch:
 
 jobs:
