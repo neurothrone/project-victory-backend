@@ -2,10 +2,10 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const msgLog = require("./mongoose")
 const express = require("express");
-const https = require("https");
+const http = require("http");
 const { Server } = require("socket.io");
 const app = express();
-const server = https.createServer(app);
+const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 const cors = require("cors");
 
