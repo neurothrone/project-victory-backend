@@ -20,20 +20,18 @@ app.use(express.static("public"));
 app.use(express.json());
 app.use(cors());
 
-io.on("connection", (socket) => {
-  console.log("A user connected:", socket.id);
-
-  socket.on("disconnect", () => {
-      console.log("A user disconnected:", socket.id);
-  });
-});
 
 app.get(
   "/api/messages",
   async(req, res) => {
-    const storedMessages = await msgLog.find({}).sort({timestamp: 1});
-    console.log("Getting all messages" + storedMessages);
-    res.json(storedMessages);
+    try{
+      const storedMessages = await msgLog.find({}).sort({timestamp: 1});
+      console.log("Getting all messages" + storedMessages);
+      res.json(storedMessages);
+    }
+    catch (error){
+      console.log(error);
+    }
   }
 );
 
@@ -45,7 +43,7 @@ app.post(
       if (!message) {
         return res.status(400).json({ error: "Text is required" });
       }
-      io.emit("newMessage", newMessage);
+      io.emit("message", message);
       res.json(message);
     }
     catch (error) {
