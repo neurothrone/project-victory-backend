@@ -11,7 +11,7 @@ const cors = require("cors");
 
 const io = new Server(server, {
   cors: {
-      origin: "https://witty-tree-0301e6603.4.azurestaticapps.net", // Frontend URL
+      origin: "https://victorychat.azurewebsites.net", // Frontend URL
       methods: ["GET", "POST"],
   },
 });
