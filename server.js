@@ -107,7 +107,6 @@ app.post(
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    clearFutureMessages();
     console.log("connected to mongodb");
     server.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
   })
