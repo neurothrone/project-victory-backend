@@ -86,7 +86,7 @@ app.post(
       }
 
       const max_msg_length = 256;
-      if(text.length > max_msg_length){
+      if(message.length > max_msg_length){
         return res.status(400).json({
           error:`message cannot exceed ${max_msg_length} characters.`
         });
