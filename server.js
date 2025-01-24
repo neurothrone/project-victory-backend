@@ -77,7 +77,7 @@ app.get("/api/msg", async (req, res) => {
 
 
 app.post(
-  "/api/message/",
+  "/api/messages/",
   async (req, res) => {
     try {
       //const message = await msgLog.create(req.body);
