@@ -81,6 +81,7 @@ app.post(
   async (req, res) => {
     try {
       const message = await msgLog.create(req.body);
+
       if (!message || message.Date !== Date.now()) {
         return res.status(400).json({ error: "Text is required & no past/future messages." });
       }
@@ -94,7 +95,7 @@ app.post(
 
 
       io.emit("message", message);
-      res.json(message);
+      res.status(200).json(message);
     } catch (error) {
       console.log(error.message)
       res.status(404);
