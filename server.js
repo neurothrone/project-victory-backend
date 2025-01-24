@@ -77,13 +77,14 @@ app.get("/api/msg", async (req, res) => {
 
 
 app.post(
-  "/api/messages/",
+  "/api/message/",
   async (req, res) => {
     try {
-      const message = await msgLog.create(req.body);
+      //const message = await msgLog.create(req.body);
+      const {message, Date: messageDate } = req.body;
 
-      if (!message || message.Date !== Date.now()) {
-        return res.status(400).json({ error: "Text is required & no past/future messages." });
+      if (!message) {
+        return res.status(400).json({ error: "Text is required." });
       }
 
       const max_msg_length = 256;
@@ -92,10 +93,25 @@ app.post(
           error:`message cannot exceed ${max_msg_length} characters.`
         });
       }
+      const now = Date.now();
+      const receivedTimestamp = messageDate
+      ? new Date(messageDate).getTime()
+      : now;
+      const max_allowed_drift = 1000 * 60; // allow 1 minute drift since date is measured in milliseconds.
+      if( messageDate &&
+        isNaN(receivedTimestamp) || Math.abs(receivedTimestamp - now) > max_allowed_drift){
+        return res.status(400).json({error: "invalid message timestamp. No past or future messages."});
+      }
 
+      const messageData = {
+        message,
+        timestamp: now, // Always use the server's timestamp
+      };  
 
-      io.emit("message", message);
-      res.status(200).json(message);
+      const newMessage = await msgLog.create(messageData);
+
+      io.emit("message", newMessage);
+      res.status(201).json(newMessage);
     } catch (error) {
       console.log(error.message)
       res.status(404);
