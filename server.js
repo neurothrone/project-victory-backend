@@ -84,6 +84,15 @@ app.post(
       if (!message || message.Date !== Date.now()) {
         return res.status(400).json({ error: "Text is required & no past/future messages." });
       }
+
+      const max_msg_length = 256;
+      if(text.length > max_msg_length){
+        return res.status(400).json({
+          error:`message cannot exceed ${max_msg_length} characters.`
+        });
+      }
+
+
       io.emit("message", message);
       res.json(message);
     } catch (error) {
