@@ -81,8 +81,8 @@ app.post(
   async (req, res) => {
     try {
       const message = await msgLog.create(req.body);
-      if (!message) {
-        return res.status(400).json({ error: "Text is required" });
+      if (!message || message.Date !== Date.now()) {
+        return res.status(400).json({ error: "Text is required & no past/future messages." });
       }
       io.emit("message", message);
       res.json(message);
@@ -93,9 +93,12 @@ app.post(
   }
 );
 
+
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
+    clearFutureMessages();
     console.log("connected to mongodb");
     server.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
   })
