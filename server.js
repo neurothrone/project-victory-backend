@@ -1,6 +1,7 @@
+// !: Setup
 require("dotenv").config();
 const mongoose = require("mongoose");
-const msgLog = require("./mongoose")
+const Message = require("./models/message");
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -9,14 +10,17 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 const cors = require("cors");
 
-const CLIENT_URL = "https://nice-grass-0741fb703.4.azurestaticapps.net";
+// const CLIENT_URL = "https://nice-grass-0741fb703.4.azurestaticapps.net";
+const CLIENT_URL = "http://localhost:5173";
 
+// !: Middleware
 app.use(express.static("public"));
 app.use(express.json());
 app.use(cors({
-  origin: CLIENT_URL,
+  origin: CLIENT_URL
 }));
 
+// !: Websocket
 const io = new Server(server, {
   cors: {
     origin: CLIENT_URL,
@@ -33,13 +37,14 @@ io.on("connection", (socket) => {
   });
 });
 
+// !: Endpoints
 app.get(
   "/api/messages",
   async (req, res) => {
     const sixHoursAgo = Date.now() - 6 * 60 * 60 * 1000;
     console.log(sixHoursAgo); // Outputs something like 1674460800000
     try {
-      const storedMessages = await msgLog.find({}).sort({ timestamp: 1 });
+      const storedMessages = await Message.find({}).sort({ timestamp: 1 });
       res.json(storedMessages);
     } catch (error) {
       console.log(error);
@@ -64,7 +69,7 @@ app.get("/api/msg", async (req, res) => {
     }
 
     // Fetch messages with the applied filter
-    const storedMessages = await msgLog.find(filter).sort({ timestamp: 1 });
+    const storedMessages = await Message.find(filter).sort({ timestamp: 1 });
 
     // Return the filtered messages
     res.json(storedMessages);
@@ -74,21 +79,22 @@ app.get("/api/msg", async (req, res) => {
   }
 });
 
-
-
 app.post(
-  "/api/messages/",
+  "/api/messages",
   async (req, res) => {
     try {
-      //const message = await msgLog.create(req.body);
-      const {message, Date: messageDate } = req.body;
+      const {username, text, Date: messageDate } = req.body;
 
-      if (!message) {
+      if (!username) {
+        return res.status(400).json({ error: "Username is required." });
+      }
+
+      if (!text) {
         return res.status(400).json({ error: "Text is required." });
       }
 
       const max_msg_length = 256;
-      if(message.length > max_msg_length){
+      if(text.length > max_msg_length){
         return res.status(400).json({
           error:`message cannot exceed ${max_msg_length} characters.`
         });
@@ -104,11 +110,12 @@ app.post(
       }
 
       const messageData = {
-        message,
+        username,
+        text,
         timestamp: now, // Always use the server's timestamp
-      };  
+      };
 
-      const newMessage = await msgLog.create(messageData);
+      const newMessage = await Message.create(messageData);
 
       io.emit("message", newMessage);
       res.status(201).json(newMessage);
@@ -119,8 +126,7 @@ app.post(
   }
 );
 
-
-
+// !: Start server
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
