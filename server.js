@@ -10,8 +10,8 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 const cors = require("cors");
 
-const CLIENT_URL = process.env.DEV_CLIENT_BASE_URL;
-// const CLIENT_URL = process.env.PROD_CLIENT_BASE_URL;
+//const CLIENT_URL = process.env.DEV_CLIENT_BASE_URL;
+ const CLIENT_URL = process.env.PROD_CLIENT_BASE_URL;
 
 // !: Middleware
 app.use(express.static("public"));
